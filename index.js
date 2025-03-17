@@ -6,15 +6,19 @@ const bodyParser = require('body-parser');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
 const LINE_ACCESS_TOKEN = process.env.LINE_ACCESS_TOKEN;
-const LINE_CHANNEL_SECRET = process.env.LINE_CHANNEL_SECRET; // LINEのチャネルシークレット
+const LINE_CHANNEL_SECRET = process.env.LINE_CHANNEL_SECRET;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 const paidUsers = new Set(["user_id_1", "user_id_2"]);
 const sentUserId = new Set(); // 送信済みのユーザーIDを記録
 
 app.use(bodyParser.json());
+
+// Render の起動確認エンドポイント
+app.get("/", (req, res) => {
+    res.send("✅ Server is running on Render!");
+});
 
 // LINEの署名検証
 function validateSignature(req) {
@@ -43,7 +47,7 @@ app.post("/webhook", async (req, res) => {
         // 最初の1回だけ `userId` を送信
         if (!sentUserId.has(userId)) {
             await replyMessage(userId, `あなたのUser IDは: ${userId} です。`);
-            sentUserId.add(userId); // 送信済みにする
+            sentUserId.add(userId);
         }
 
         // ここからは通常の処理（占いチャット）
@@ -136,7 +140,7 @@ app.post("/remove-paid-user", async (req, res) => {
     }
 });
 
-// サーバーを起動
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+// サーバーを起動 (Render対応)
+app.listen(PORT, "0.0.0.0", () => {
+    console.log(`✅ Server running on port ${PORT}`);
 });
