@@ -76,14 +76,19 @@ async function getGPTResponse(userMessage) {
             messages: [
                 { role: "system", content: "あなたは占い師です。優しく悩みを聞き、適切な占い結果を伝えてください。" },
                 { role: "user", content: userMessage }
-            ]
+            ],
+            temperature: 0.7,
+            max_tokens: 100
         }, {
-            headers: { "Authorization": `Bearer ${OPENAI_API_KEY}` }
+            headers: {
+                "Authorization": `Bearer ${OPENAI_API_KEY}`,
+                "Content-Type": "application/json"
+            }
         });
 
         return response.data.choices[0].message.content;
     } catch (error) {
-        console.error("Error calling OpenAI API:", error);
+        console.error("🔴 OpenAI APIエラー:", error.response?.status, JSON.stringify(error.response?.data, null, 2) || error.message);
         return "申し訳ありませんが、占いができませんでした。";
     }
 }
@@ -144,3 +149,4 @@ app.post("/remove-paid-user", async (req, res) => {
 app.listen(PORT, "0.0.0.0", () => {
     console.log(`✅ Server running on port ${PORT}`);
 });
+
